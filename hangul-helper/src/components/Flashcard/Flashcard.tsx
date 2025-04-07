@@ -63,10 +63,10 @@ export const Flashcard = ({ flashcard, onMarkCorrect, onMarkIncorrect }: Flashca
             )}
           </Box>
           
-          <Box sx={{ width: '100%', maxWidth: 600, my: 2 }}>
+          <Box sx={{ width: '100%', maxWidth: 600, my: 2, bgcolor: 'white', borderRadius: 1 }}>
             <DrawingCanvas
               width={600}
-              height={200}
+              height={300}
               onDrawingChange={setDrawing}
             />
           </Box>
@@ -101,10 +101,10 @@ export const Flashcard = ({ flashcard, onMarkCorrect, onMarkIncorrect }: Flashca
           </Typography>
 
           {drawing && (
-            <Box sx={{ width: '100%', maxWidth: 600, my: 2 }}>
+            <Box sx={{ width: '100%', maxWidth: 600, my: 2, bgcolor: 'white', borderRadius: 1 }}>
               <DrawingCanvas
                 width={600}
-                height={200}
+                height={300}
                 readOnly
                 existingDrawing={drawing}
               />

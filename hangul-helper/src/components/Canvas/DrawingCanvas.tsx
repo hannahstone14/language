@@ -1,5 +1,5 @@
 import { Box } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 interface DrawingCanvasProps {
   width?: number;
@@ -12,8 +12,12 @@ interface DrawingCanvasProps {
 export const DrawingCanvas = ({
   width = 500,
   height = 300,
+  onDrawingChange,
+  readOnly = false,
+  existingDrawing,
 }: DrawingCanvasProps) => {
   const [scriptLoaded, setScriptLoaded] = useState(false);
+  const drawingRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     // Check if script is already loaded
@@ -38,6 +42,31 @@ export const DrawingCanvas = ({
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (scriptLoaded && drawingRef.current) {
+      // Set up event listeners for drawing changes
+      const handleDrawingChange = (event: Event) => {
+        const target = event.target as HTMLElement;
+        if (target.tagName.toLowerCase() === 'brush-ninja-drawing') {
+          // Get the drawing data and pass it to the parent
+          const drawingData = (target as any).getImage();
+          onDrawingChange?.(drawingData);
+        }
+      };
+
+      drawingRef.current.addEventListener('change', handleDrawingChange);
+      
+      // Load existing drawing if provided
+      if (existingDrawing && (drawingRef.current as any).loadImage) {
+        (drawingRef.current as any).loadImage(existingDrawing);
+      }
+
+      return () => {
+        drawingRef.current?.removeEventListener('change', handleDrawingChange);
+      };
+    }
+  }, [scriptLoaded, onDrawingChange, existingDrawing]);
 
   if (!scriptLoaded) {
     return (
@@ -67,7 +96,15 @@ export const DrawingCanvas = ({
         overflow: 'hidden',
       }}
     >
-      <brush-ninja-drawing></brush-ninja-drawing>
+      <brush-ninja-drawing
+        ref={drawingRef}
+        style={{
+          width: '100%',
+          height: '100%',
+          display: 'block',
+        }}
+        data-readonly={readOnly}
+      ></brush-ninja-drawing>
     </Box>
   );
 };
